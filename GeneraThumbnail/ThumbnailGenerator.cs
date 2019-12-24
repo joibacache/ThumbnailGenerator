@@ -6,7 +6,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
 
-namespace GeneraThumbnail
+namespace ThumbnailGenerator
 {
     public class ThumbnailGenerator
     {
@@ -18,7 +18,7 @@ namespace GeneraThumbnail
         public string Thumb_sufix { get; set; }
         public List<ThumbnailPosition> opcionesGeneracionThumbs { get; set; }
         private List<Point> thumb_corner;
-
+        public ThumbnailShape cropShape { get; set; }
         public List<Point> Thumb_corner
         {
             get
@@ -32,9 +32,9 @@ namespace GeneraThumbnail
                 thumb_corner = value;
             }
         }
-
-        private int ladoCuadroCrop;
         private Size imgSize;
+        private int ladoCuadroCropX;
+        private int ladoCuadroCropY;
 
         public ThumbnailGenerator()
         {
@@ -45,6 +45,7 @@ namespace GeneraThumbnail
             Path_output = Path_input + "\\thumb";
             Thumb_sufix = "_thmb";
             opcionesGeneracionThumbs = new List<ThumbnailPosition>();
+            cropShape = ThumbnailShape.SQUARE;
         }
 
         private void GetThumbnailCorners()
@@ -52,7 +53,7 @@ namespace GeneraThumbnail
             if (opcionesGeneracionThumbs.Count == 0)
             {
                 thumb_corner = new List<Point>();
-                thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCrop / 2), (imgSize.Height / 2) - (ladoCuadroCrop / 2)));
+                thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCropX / 2), (imgSize.Height / 2) - (ladoCuadroCropY / 2)));
             }
             else
             {
@@ -65,30 +66,30 @@ namespace GeneraThumbnail
                             thumb_corner.Add(new Point(0, 0));
                             break;
                         case ThumbnailPosition.TOP_CENTER:
-                            thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCrop / 2), 0));
+                            thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCropX / 2), 0));
                             break;
                         case ThumbnailPosition.TOP_RIGHT:
-                            thumb_corner.Add(new Point(imgSize.Width - ladoCuadroCrop, 0));
+                            thumb_corner.Add(new Point(imgSize.Width - ladoCuadroCropX, 0));
                             break;
 
                         case ThumbnailPosition.MID_LEFT:
-                            thumb_corner.Add(new Point(0 , (imgSize.Height/2)-(ladoCuadroCrop/2)));
+                            thumb_corner.Add(new Point(0 , (imgSize.Height/2)-(ladoCuadroCropY/2)));
                             break;
                         case ThumbnailPosition.MID_CENTER:
-                            thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCrop / 2), (imgSize.Height / 2) - (ladoCuadroCrop / 2)));
+                            thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCropX / 2), (imgSize.Height / 2) - (ladoCuadroCropY / 2)));
                             break;
                         case ThumbnailPosition.MID_RIGHT:
-                            thumb_corner.Add(new Point(imgSize.Width - ladoCuadroCrop, (imgSize.Height / 2) - (ladoCuadroCrop / 2)));
+                            thumb_corner.Add(new Point(imgSize.Width - ladoCuadroCropX, (imgSize.Height / 2) - (ladoCuadroCropY / 2)));
                             break;
 
                         case ThumbnailPosition.BOTTOM_LEFT:
-                            thumb_corner.Add(new Point(0, imgSize.Height-ladoCuadroCrop));
+                            thumb_corner.Add(new Point(0, imgSize.Height-ladoCuadroCropY));
                             break;
                         case ThumbnailPosition.BOTTOM_CENTER:
-                            thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCrop / 2), imgSize.Height - ladoCuadroCrop));
+                            thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCropX / 2), imgSize.Height - ladoCuadroCropY));
                             break;
                         case ThumbnailPosition.BOTTOM_RIGHT:
-                            thumb_corner.Add(new Point(imgSize.Width - ladoCuadroCrop , imgSize.Height - ladoCuadroCrop));
+                            thumb_corner.Add(new Point(imgSize.Width - ladoCuadroCropX , imgSize.Height - ladoCuadroCropY));
                             break;
                     }
                 }
@@ -99,8 +100,7 @@ namespace GeneraThumbnail
         {
             string outputImg;
             string extension;
-            //int ladoCuadroCrop;
-            int ladoCorto;
+            
             string outputFullName;
             
             ResizeOptions ropt = new ResizeOptions()
@@ -119,22 +119,16 @@ namespace GeneraThumbnail
                 foreach(string archivo in archivos)
                 using (Image image = Image.Load(archivo))
                 {
-                    imgSize = image.Size();
                     outputImg = Path.GetFileNameWithoutExtension(archivo);
                     extension = Path.GetExtension(archivo);
-                        Console.WriteLine(outputImg + extension);
-
-                    ladoCorto = image.Width > image.Height ? image.Height : image.Width;
-                    ladoCuadroCrop = (int)Math.Floor(ladoCorto * ((double)Image_thumbPercentage/100));
-
-                    Rectangle rec = new Rectangle(0, 0, ladoCuadroCrop, ladoCuadroCrop);
+                    Console.WriteLine(outputImg + extension);
+                    imgSize = image.Size();
+                        Rectangle rec = generaRectanguloCrop();
                     
                     GetThumbnailCorners();
                     foreach(Point punto in Thumb_corner)
                     {
-                        Point pointAux = punto;
-                        rec.X = pointAux.X;
-                        rec.Y = pointAux.Y;
+                        reubicarRectangulo(punto,rec);
                         var imgnva = image.Clone(x => x.Crop(rec).Resize(ropt));
                         outputFullName = Path_output + "/" + outputImg + Thumb_sufix + "_" + Thumb_corner.IndexOf(punto) + extension;
                         if (!Directory.Exists(Path_output))
@@ -151,6 +145,35 @@ namespace GeneraThumbnail
             }
         }
 
+        private Rectangle generaRectanguloCrop()
+        {
+            int ladoCorto;
+
+            switch (cropShape)
+            {
+                case ThumbnailShape.SQUARE:
+                    if (imgSize.Height < imgSize.Width)
+                        ladoCorto = imgSize.Height;
+                    else
+                        ladoCorto = imgSize.Width;
+                    ladoCuadroCropX = (int)Math.Floor(ladoCorto * ((double)Image_thumbPercentage / 100));
+                    ladoCuadroCropY = (int)Math.Floor(ladoCorto * ((double)Image_thumbPercentage / 100));
+                    break;
+                case ThumbnailShape.RECTANGLE:
+                    ladoCuadroCropX = (int)Math.Floor(imgSize.Width * ((double)Image_thumbPercentage / 100));
+                    ladoCuadroCropY = (int)Math.Floor(imgSize.Height * ((double)Image_thumbPercentage / 100));
+                    break;
+            }
+            
+            Rectangle rec = new Rectangle(0, 0, ladoCuadroCropX, ladoCuadroCropY);
+            return rec;
+        }
+
+        private void reubicarRectangulo(Point newPosition,Rectangle rec)
+        {
+            rec.X = newPosition.X;
+            rec.Y = newPosition.Y;
+        }
 
         public enum ThumbnailPosition
         {
@@ -164,6 +187,11 @@ namespace GeneraThumbnail
             BOTTOM_CENTER,
             BOTTOM_LEFT
         }
+
+        public enum ThumbnailShape
+        {
+            SQUARE,
+            RECTANGLE
+        }
     }
-    
 }
