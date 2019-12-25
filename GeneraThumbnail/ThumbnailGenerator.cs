@@ -10,86 +10,85 @@ namespace ThumbnailGenerator
 {
     public class ThumbnailGenerator
     {
-        public int Image_thumbPercentage { get; set; }
-        public int Thumb_maxSize { get; set; }
-        public List<string> File_extensions { get; set; }
-        public string Path_output { get; set; }
-        public string Path_input { get; set; }
-        public string Thumb_sufix { get; set; }
+        public int imagePercentageThumbCoverage { get; set; }
+        public int thumbnailMaxSize { get; set; }
+        public List<string> fileExtensions { get; set; }
+        public string outputPath { get; set; }
+        public string inputPath { get; set; }
+        public string thumbSufix { get; set; }
         public List<ThumbnailPosition> opcionesGeneracionThumbs { get; set; }
-        private List<Point> thumb_corner;
+        private List<Point> thumbCorner;
         public ThumbnailShape cropShape { get; set; }
-        public List<Point> Thumb_corner
+        public List<Point> ThumbCorner
         {
             get
             {
-                if(thumb_corner == null)
-                    GetThumbnailCorners();
-                return thumb_corner;
+                if(thumbCorner == null)
+                    GenerateThumbnailCorners();
+                return thumbCorner;
             }
             set
             {
-                thumb_corner = value;
+                thumbCorner = value;
             }
         }
-        private Size imgSize;
-        private int ladoCuadroCropX;
-        private int ladoCuadroCropY;
+        private Size _imgSize;
+        private int _ladoCuadroCropX;
+        private int _ladoCuadroCropY;
 
         public ThumbnailGenerator()
         {
-            Image_thumbPercentage = 100;
-            Thumb_maxSize = 100;
-            File_extensions = new List<string> { ".jpg" };
-            Path_input = "\\";
-            Path_output = Path_input + "\\thumb";
-            Thumb_sufix = "_thmb";
+            imagePercentageThumbCoverage = 100;
+            thumbnailMaxSize = 100;
+            fileExtensions = new List<string> { ".jpg" };
+            inputPath = "\\";
+            outputPath = inputPath + "\\thumb";
+            thumbSufix = string.Empty ;
             opcionesGeneracionThumbs = new List<ThumbnailPosition>();
             cropShape = ThumbnailShape.SQUARE;
         }
 
-        private void GetThumbnailCorners()
+        private void GenerateThumbnailCorners()
         {
             if (opcionesGeneracionThumbs.Count == 0)
             {
-                thumb_corner = new List<Point>();
-                thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCropX / 2), (imgSize.Height / 2) - (ladoCuadroCropY / 2)));
+                thumbCorner = new List<Point>();
+                thumbCorner.Add(new Point((_imgSize.Width / 2) - (_ladoCuadroCropX / 2), (_imgSize.Height / 2) - (_ladoCuadroCropY / 2)));
             }
             else
             {
-                thumb_corner = new List<Point>();
+                thumbCorner = new List<Point>();
                 foreach (ThumbnailPosition configPosicion in opcionesGeneracionThumbs)
                 {
                     switch(configPosicion)
                     {
                         case ThumbnailPosition.TOP_LEFT:
-                            thumb_corner.Add(new Point(0, 0));
+                            thumbCorner.Add(new Point(0, 0));
                             break;
                         case ThumbnailPosition.TOP_CENTER:
-                            thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCropX / 2), 0));
+                            thumbCorner.Add(new Point((_imgSize.Width / 2) - (_ladoCuadroCropX / 2), 0));
                             break;
                         case ThumbnailPosition.TOP_RIGHT:
-                            thumb_corner.Add(new Point(imgSize.Width - ladoCuadroCropX, 0));
+                            thumbCorner.Add(new Point(_imgSize.Width - _ladoCuadroCropX, 0));
                             break;
 
                         case ThumbnailPosition.MID_LEFT:
-                            thumb_corner.Add(new Point(0 , (imgSize.Height/2)-(ladoCuadroCropY/2)));
+                            thumbCorner.Add(new Point(0 , (_imgSize.Height/2)-(_ladoCuadroCropY/2)));
                             break;
                         case ThumbnailPosition.MID_CENTER:
-                            thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCropX / 2), (imgSize.Height / 2) - (ladoCuadroCropY / 2)));
+                            thumbCorner.Add(new Point((_imgSize.Width / 2) - (_ladoCuadroCropX / 2), (_imgSize.Height / 2) - (_ladoCuadroCropY / 2)));
                             break;
                         case ThumbnailPosition.MID_RIGHT:
-                            thumb_corner.Add(new Point(imgSize.Width - ladoCuadroCropX, (imgSize.Height / 2) - (ladoCuadroCropY / 2)));
+                            thumbCorner.Add(new Point(_imgSize.Width - _ladoCuadroCropX, (_imgSize.Height / 2) - (_ladoCuadroCropY / 2)));
                             break;
-
                         case ThumbnailPosition.BOTTOM_LEFT:
-                            thumb_corner.Add(new Point(0, imgSize.Height-ladoCuadroCropY));
+                            thumbCorner.Add(new Point(0, _imgSize.Height-_ladoCuadroCropY));
                             break;
                         case ThumbnailPosition.BOTTOM_CENTER:
-                            thumb_corner.Add(new Point((imgSize.Width / 2) - (ladoCuadroCropX / 2), imgSize.Height - ladoCuadroCropY));
+                            thumbCorner.Add(new Point((_imgSize.Width / 2) - (_ladoCuadroCropX / 2), _imgSize.Height - _ladoCuadroCropY));
                             break;
                         case ThumbnailPosition.BOTTOM_RIGHT:
-                            thumb_corner.Add(new Point(imgSize.Width - ladoCuadroCropX , imgSize.Height - ladoCuadroCropY));
+                            thumbCorner.Add(new Point(_imgSize.Width - _ladoCuadroCropX , _imgSize.Height - _ladoCuadroCropY));
                             break;
                     }
                 }
@@ -107,14 +106,14 @@ namespace ThumbnailGenerator
             {
                 Compand = true,
                 Sampler = KnownResamplers.Lanczos3,
-                Size = new Size(Thumb_maxSize, Thumb_maxSize)
+                Size = new Size(thumbnailMaxSize, thumbnailMaxSize)
             };
 
             try
             {
                 List<string> archivos = new List<string>();
-                foreach (string fileExtension in File_extensions)
-                    archivos.AddRange(Directory.EnumerateFiles(Path_input, "*" + fileExtension));
+                foreach (string fileExtension in fileExtensions)
+                    archivos.AddRange(Directory.EnumerateFiles(inputPath, "*" + fileExtension));
 
                 foreach(string archivo in archivos)
                 using (Image image = Image.Load(archivo))
@@ -122,17 +121,17 @@ namespace ThumbnailGenerator
                     outputImg = Path.GetFileNameWithoutExtension(archivo);
                     extension = Path.GetExtension(archivo);
                     Console.WriteLine(outputImg + extension);
-                    imgSize = image.Size();
-                        Rectangle rec = generaRectanguloCrop();
+                    _imgSize = image.Size();
+                        Rectangle rec = GenerateCropRectangle();
                     
-                    GetThumbnailCorners();
-                    foreach(Point punto in Thumb_corner)
+                    GenerateThumbnailCorners();
+                    foreach(Point punto in ThumbCorner)
                     {
-                        reubicarRectangulo(punto,rec);
+                        RectangleReposition(punto,ref rec);
                         var imgnva = image.Clone(x => x.Crop(rec).Resize(ropt));
-                        outputFullName = Path_output + "/" + outputImg + Thumb_sufix + "_" + Thumb_corner.IndexOf(punto) + extension;
-                        if (!Directory.Exists(Path_output))
-                            Directory.CreateDirectory(Path_output);
+                        outputFullName = outputPath + "/" + outputImg + thumbSufix + "_" + ThumbCorner.IndexOf(punto) + extension;
+                        if (!Directory.Exists(outputPath))
+                            Directory.CreateDirectory(outputPath);
                         if (File.Exists(outputFullName))
                         File.Delete(outputFullName);
                         imgnva.Save(outputFullName);
@@ -142,34 +141,29 @@ namespace ThumbnailGenerator
             catch(Exception exc)
             {
                 var error = exc;
+                //TODO: implement logging
             }
         }
 
-        private Rectangle generaRectanguloCrop()
+        private Rectangle GenerateCropRectangle()
         {
             int ladoCorto;
 
             switch (cropShape)
             {
                 case ThumbnailShape.SQUARE:
-                    if (imgSize.Height < imgSize.Width)
-                        ladoCorto = imgSize.Height;
-                    else
-                        ladoCorto = imgSize.Width;
-                    ladoCuadroCropX = (int)Math.Floor(ladoCorto * ((double)Image_thumbPercentage / 100));
-                    ladoCuadroCropY = (int)Math.Floor(ladoCorto * ((double)Image_thumbPercentage / 100));
+                    ladoCorto = _imgSize.Height < _imgSize.Width ? _imgSize.Height : _imgSize.Width;
+                    _ladoCuadroCropX = (int)Math.Floor(ladoCorto * ((double)imagePercentageThumbCoverage / 100));
+                    _ladoCuadroCropY = _ladoCuadroCropX;
                     break;
-                case ThumbnailShape.RECTANGLE:
-                    ladoCuadroCropX = (int)Math.Floor(imgSize.Width * ((double)Image_thumbPercentage / 100));
-                    ladoCuadroCropY = (int)Math.Floor(imgSize.Height * ((double)Image_thumbPercentage / 100));
-                    break;
+                //TODO: add rectangle support
             }
             
-            Rectangle rec = new Rectangle(0, 0, ladoCuadroCropX, ladoCuadroCropY);
+            Rectangle rec = new Rectangle(0, 0, _ladoCuadroCropX, _ladoCuadroCropY);
             return rec;
         }
 
-        private void reubicarRectangulo(Point newPosition,Rectangle rec)
+        private void RectangleReposition(Point newPosition,ref Rectangle rec)
         {
             rec.X = newPosition.X;
             rec.Y = newPosition.Y;
@@ -190,8 +184,8 @@ namespace ThumbnailGenerator
 
         public enum ThumbnailShape
         {
-            SQUARE,
-            RECTANGLE
+            SQUARE
+            //TODO: add rectangle shape
         }
     }
 }

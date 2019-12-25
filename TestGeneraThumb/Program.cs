@@ -10,19 +10,17 @@ namespace TestGeneraThumb
         {
             //Console.WriteLine("Hello World!");
             ThumbnailGenerator.ThumbnailGenerator thumbGeneator = new ThumbnailGenerator.ThumbnailGenerator();
-            thumbGeneator.Path_input = "/Volumes/Almacenamiento/Pruebas/";
-            thumbGeneator.Path_output = "/Volumes/Almacenamiento/Pruebas/Salida/";
-            thumbGeneator.File_extensions = new List<string> { ".jpg" };
-            thumbGeneator.Thumb_sufix = "_tmb";
-            thumbGeneator.Thumb_maxSize = 250;
-            thumbGeneator.Image_thumbPercentage = 80;
-            thumbGeneator.Thumb_sufix = "_tb";
-            thumbGeneator.cropShape = ThumbnailGenerator.ThumbnailGenerator.ThumbnailShape.RECTANGLE;
+            thumbGeneator.inputPath = "/Volumes/Almacenamiento/Pruebas/";
+            thumbGeneator.outputPath = "/Volumes/Almacenamiento/Pruebas/Salida/";
+            thumbGeneator.fileExtensions = new List<string> { ".jpg" };
+            thumbGeneator.thumbnailMaxSize = 250;
+            thumbGeneator.imagePercentageThumbCoverage = 80;
+            thumbGeneator.cropShape = ThumbnailGenerator.ThumbnailGenerator.ThumbnailShape.SQUARE;
+
             thumbGeneator.opcionesGeneracionThumbs.Add(ThumbnailGenerator.ThumbnailGenerator.ThumbnailPosition.TOP_CENTER);
             thumbGeneator.opcionesGeneracionThumbs.Add(ThumbnailGenerator.ThumbnailGenerator.ThumbnailPosition.BOTTOM_LEFT);
 
             thumbGeneator.CreateThumbnails();
-            //thumbGeneator.m1("/Volumes/Almacenamiento/Pruebas/", 0.7, 200,"");
         }
     }
 }
