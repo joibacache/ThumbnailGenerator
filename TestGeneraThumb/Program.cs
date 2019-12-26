@@ -15,8 +15,8 @@ namespace TestGeneraThumb
             thumbGeneator.fileExtensions = new List<string> { ".jpg" };
             thumbGeneator.thumbnailMaxSize = 250;
             thumbGeneator.imagePercentageThumbCoverage = 80;
-            thumbGeneator.cropShape = ThumbnailGenerator.ThumbnailGenerator.ThumbnailShape.SQUARE;
-
+            thumbGeneator.cropShape = ThumbnailGenerator.ThumbnailGenerator.ThumbnailShape.RECTANGLE_16X9;
+            thumbGeneator.thumbSufix = "16_9";
             thumbGeneator.opcionesGeneracionThumbs.Add(ThumbnailGenerator.ThumbnailGenerator.ThumbnailPosition.TOP_CENTER);
             thumbGeneator.opcionesGeneracionThumbs.Add(ThumbnailGenerator.ThumbnailGenerator.ThumbnailPosition.BOTTOM_LEFT);
 
