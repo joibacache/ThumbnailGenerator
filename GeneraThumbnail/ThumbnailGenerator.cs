@@ -54,11 +54,10 @@ namespace ThumbnailGenerator
             opcionesGeneracionThumbs.Add(ThumbnailPosition.MID_CENTER);
             cropShape = ThumbnailShape.SQUARE;
             shortSideGuidedCalculations = true;
-
         }
 
         /// <summary>
-        /// Creates the anchor point for every thumnail that will be created
+        /// Creates the anchor point for every thumbnail that will be created
         /// </summary>
         private void GenerateThumbnailCorners()
         {
@@ -133,12 +132,9 @@ namespace ThumbnailGenerator
         {
             string outputImg;
             string extension;
-            
             string outputFullName;
 
             ResizeOptions ropt = CreateResizeOptions();
-            
-
             try
             {
                 List<string> archivos = new List<string>();
@@ -198,7 +194,6 @@ namespace ThumbnailGenerator
                     _cropRectangleWidth = (int)Math.Floor(ladoGuia * (double)imagePercentageThumbCoverage / 100);
                     _cropRectangleHeight = (int)Math.Floor(_cropRectangleWidth * 0.562);
                     break;
-
             }
             
             Rectangle rec = new Rectangle(0, 0, _cropRectangleWidth, _cropRectangleHeight);
