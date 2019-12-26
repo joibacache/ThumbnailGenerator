@@ -57,7 +57,9 @@ namespace ThumbnailGenerator
 
         }
 
-        //Creates the anchor point for every thumnail that will be created
+        /// <summary>
+        /// Creates the anchor point for every thumnail that will be created
+        /// </summary>
         private void GenerateThumbnailCorners()
         {
             if (opcionesGeneracionThumbs.Count == 0)
@@ -105,6 +107,7 @@ namespace ThumbnailGenerator
             }
         }
 
+        //Creates the ResizeOptions needed to resize the image crop to become a thumbnail, depending on the crop ratio
         private ResizeOptions CreateResizeOptions()
         {
             ResizeOptions resizeOptions = new ResizeOptions();
@@ -201,14 +204,21 @@ namespace ThumbnailGenerator
             Rectangle rec = new Rectangle(0, 0, _cropRectangleWidth, _cropRectangleHeight);
             return rec;
         }
-        
-        //Changes the x and y position of the given rectangle
+
+        /// <summary>
+        /// Changes the x and y position of the given rectangle
+        /// </summary>
+        /// <param name="newPosition">The point where the top-left corner of the rectangle should be placed</param>
+        /// <param name="rec">The rectangle that will be repositioned</param>
         private void RectangleReposition(Point newPosition,ref Rectangle rec)
         {
             rec.X = newPosition.X;
             rec.Y = newPosition.Y;
         }
 
+        /// <summary>
+        /// Represents the different crops that can be made to the original image to create a thumbnail
+        /// </summary>
         public enum ThumbnailPosition
         {
             TOP_RIGHT,
@@ -222,6 +232,9 @@ namespace ThumbnailGenerator
             BOTTOM_LEFT
         }
 
+        /// <summary>
+        /// Represents the different aspect ratio that are available to crop thumbnails
+        /// </summary>
         public enum ThumbnailShape
         {
             SQUARE,
