@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
 
@@ -10,6 +9,7 @@ namespace ThumbnailGenerator
 {
     public class ThumbnailGenerator
     {
+        #region variables declaration
         public int imagePercentageThumbCoverage { get; set; }
         public int thumbnailMaxSize { get; set; }
         public List<string> fileExtensions { get; set; }
@@ -35,19 +35,26 @@ namespace ThumbnailGenerator
         private Size _imgSize;
         private int _ladoCuadroCropX;
         private int _ladoCuadroCropY;
+        #endregion
 
+        /// <summary>
+        /// Creates a new instance of ThumbnailGeneration with default values.
+        /// Square 100x100px centered thumbnail for every .jpg in the same folder that the dll is located
+        /// </summary>
         public ThumbnailGenerator()
         {
-            imagePercentageThumbCoverage = 100;
-            thumbnailMaxSize = 100;
-            fileExtensions = new List<string> { ".jpg" };
             inputPath = "\\";
             outputPath = inputPath + "\\thumb";
+            fileExtensions = new List<string> { ".jpg" };
+            imagePercentageThumbCoverage = 100;
+            thumbnailMaxSize = 100;
             thumbSufix = string.Empty ;
             opcionesGeneracionThumbs = new List<ThumbnailPosition>();
+            opcionesGeneracionThumbs.Add(ThumbnailPosition.MID_CENTER);
             cropShape = ThumbnailShape.SQUARE;
         }
 
+        //Creates the anchor point for every thumnail that will be created
         private void GenerateThumbnailCorners()
         {
             if (opcionesGeneracionThumbs.Count == 0)
@@ -95,6 +102,7 @@ namespace ThumbnailGenerator
             }
         }
 
+        //The center of all, this method generates the thumbnails
         public void CreateThumbnails()
         {
             string outputImg;
@@ -145,6 +153,8 @@ namespace ThumbnailGenerator
             }
         }
 
+        //Creates the rectagle object, used to select the area of the image that will be used to create the thumbnail,
+        //defines the size of the rectangle, locating it in 0,0 position
         private Rectangle GenerateCropRectangle()
         {
             int ladoCorto;
@@ -163,6 +173,7 @@ namespace ThumbnailGenerator
             return rec;
         }
 
+        //Changes the x and y position of the given rectangle
         private void RectangleReposition(Point newPosition,ref Rectangle rec)
         {
             rec.X = newPosition.X;
@@ -184,8 +195,8 @@ namespace ThumbnailGenerator
 
         public enum ThumbnailShape
         {
-            SQUARE
-            //TODO: add rectangle shape
+            SQUARE,
+            RECTANGE_3x2
         }
     }
 }
